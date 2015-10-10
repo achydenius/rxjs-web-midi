@@ -1,0 +1,13 @@
+{
+  "name": "rxjs-web-midi",
+  "version": "1.0.0",
+  "description": "RxJS bindings for Web MIDI API",
+  "main": "",
+  "scripts": {},
+  "author": "Arto Chydenius",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {
+    "rx": "^3.1.2"
+  }
+}
