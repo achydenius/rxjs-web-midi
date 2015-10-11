@@ -3,10 +3,16 @@
   "version": "1.0.0",
   "description": "RxJS bindings for Web MIDI API",
   "main": "",
-  "scripts": {},
+  "scripts": {
+    "build": "browserify example/*.js -t babelify | uglifyjs -c > example/app.min.js"
+  },
   "author": "Arto Chydenius",
   "license": "MIT",
-  "devDependencies": {},
+  "devDependencies": {
+    "babelify": "^6.3.0",
+    "browserify": "^11.2.0",
+    "uglifyjs": "^2.4.10"
+  },
   "dependencies": {
     "rx": "^3.1.2"
   }
