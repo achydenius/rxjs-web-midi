@@ -1,8 +1,14 @@
 import { initMidiInput } from '../lib/rxjs-web-midi';
 
-// Get stream of MIDI input messages with relevant data
+// Get stream of messages from first MIDI input
 const input = initMidiInput()
+    .flatMap((midi) => {
+        // Select first available input
+        const input = midi.inputs.values().next().value;
+        return input.messagesAsObservable();
+    })
     .map((x) => {
+        // Collect relevant data from the message
         return {
             status: x.data[0] & 0xf0,
             data: [

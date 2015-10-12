@@ -6,5 +6,4 @@ Build usage example with `npm run build`.
 
 ## TODO:
 
-* Add MIDI channel selection
-* Add some way to return MIDIAccess object to user
+* Add getting Observable of input onstatechange events
