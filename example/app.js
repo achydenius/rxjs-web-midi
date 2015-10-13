@@ -1,18 +1,22 @@
 import { initMidiInput } from '../lib/rxjs-web-midi';
 
-// Get stream of messages from first MIDI input
+// Get first available MIDI input
 const input = initMidiInput()
     .map((midi) => {
-        // Select first available input
         return midi.inputs.values().next().value;
+    });
+
+// Get stream of messages from the input
+const messages = input
+    .filter((input) => {
+        return input !== undefined;
     })
     .flatMap((input) => {
-        // Get stream of messages
         return input.messagesAsObservable();
     })
     .map((x) => {
         // Collect relevant data from the message
-        // See: http://www.midi.org/techspecs/midimessages.php
+        // See for example http://www.midi.org/techspecs/midimessages.php
         return {
             status: x.data[0] & 0xf0,
             data: [
@@ -23,16 +27,26 @@ const input = initMidiInput()
     });
 
 // Get stream of note on messages
-const notes = input
+const notes = messages
     .filter((x) => {
         return x.status === 144;
     });
 
 // Get stream of control change messages
-const controls = input
+const controls = messages
     .filter((x) => {
         return x.status === 176;
     });
+
+input.subscribe((input) => {
+    if (input !== undefined) {
+        console.log('id: ' + input.id);
+        console.log('name: ' + input.name);
+        console.log('manufacturer: ' + input.manufacturer);
+    } else {
+        console.log('No inputs available');
+    }
+});
 
 notes.subscribe((x) => {
     const note = x.data[0];

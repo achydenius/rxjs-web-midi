@@ -15,7 +15,7 @@ initMidiInput()
         return input.messagesAsObservable();
     })
     .subscribe((x) => {
-        // Output the event
+        // Output the message
         console.log(x);
     });
 ```
