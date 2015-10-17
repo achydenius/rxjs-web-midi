@@ -1,7 +1,8 @@
-import { initMidiInput } from '../lib/rxjs-web-midi';
+import Rx from 'rx';
+import { midimessageAsObservable } from '../lib/rxjs-web-midi';
 
 // Get first available MIDI input
-const input = initMidiInput()
+const input = Rx.Observable.fromPromise(navigator.requestMIDIAccess())
     .map((midi) => {
         return midi.inputs.values().next().value;
     });
@@ -12,7 +13,7 @@ const messages = input
         return input !== undefined;
     })
     .flatMap((input) => {
-        return input.messagesAsObservable();
+        return midimessageAsObservable(input);
     })
     .map((x) => {
         // Collect relevant data from the message

@@ -1,22 +1,25 @@
 # RxJS bindings for Web MIDI API
 
-Allows accessing [Web MIDI API](https://webaudio.github.io/web-midi-api/) message events as an observable sequence. Current implementation augments *MIDIInput* object with *messagesAsObservable* method.
+Allows accessing [Web MIDI API](https://webaudio.github.io/web-midi-api/) message events as an observable sequence.
 
 ## How to use
 
 ```
-initMidiInput()
+import Rx from 'rx';
+import { midimessageAsObservable } from 'rxjs-web-midi';
+
+Rx.Observable.fromPromise(navigator.requestMIDIAccess())
     .map((midi) => {
         // Select first available input
         return midi.inputs.values().next().value;
     })
     .flatMap((input) => {
         // Get stream of messages
-        return input.messagesAsObservable();
+        return midimessageAsObservable(input);
     })
-    .subscribe((x) => {
+    .subscribe((message) => {
         // Output the message
-        console.log(x);
+        console.log(message);
     });
 ```
 
