@@ -1,13 +1,20 @@
 import Rx from 'rx';
-import { midimessageAsObservable } from '../lib/rxjs-web-midi';
+import { midimessageAsObservable, statechangeAsObservable } from '../lib/rxjs-web-midi';
 
-// Get first available MIDI input
-const input = Rx.Observable.fromPromise(navigator.requestMIDIAccess())
-    .map((midi) => {
-        return midi.inputs.values().next().value;
-    });
+// MIDIAccess object
+const midi = Rx.Observable.fromPromise(navigator.requestMIDIAccess());
 
-// Get stream of messages from the input
+// Sream of state change events
+const state = midi.flatMap((midi) => {
+    return statechangeAsObservable(midi);
+});
+
+// First available MIDI input
+const input = midi.map((midi) => {
+    return midi.inputs.values().next().value;
+});
+
+// Stream of messages from the input
 const messages = input
     .filter((input) => {
         return input !== undefined;
@@ -27,17 +34,19 @@ const messages = input
         };
     });
 
-// Get stream of note on messages
-const notes = messages
-    .filter((x) => {
-        return x.status === 144;
-    });
+// Stream of note on messages
+const notes = messages.filter((x) => {
+    return x.status === 144;
+});
 
-// Get stream of control change messages
-const controls = messages
-    .filter((x) => {
-        return x.status === 176;
-    });
+// Stream of control change messages
+const controls = messages.filter((x) => {
+    return x.status === 176;
+});
+
+state.subscribe((state) => {
+    console.log(state);
+});
 
 input.subscribe((input) => {
     if (input !== undefined) {
