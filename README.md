@@ -23,4 +23,4 @@ Rx.Observable.fromPromise(navigator.requestMIDIAccess())
     });
 ```
 
-An example program is included and can be built with `npm run build`.
+An example program is included and can be built with `npm run build:example`.

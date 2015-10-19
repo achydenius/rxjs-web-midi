@@ -4,15 +4,18 @@
   "description": "RxJS bindings for Web MIDI API",
   "main": "",
   "scripts": {
-    "watch": "watchify example/app.js -t babelify -o example/dist.js -v",
-    "build": "browserify example/app.js -t babelify | uglifyjs -c > example/dist.js"
+    "watch:example": "watchify example/app.js -t babelify -o example/dist.js -v",
+    "build:example": "browserify example/app.js -t babelify -o example/dist.js",
+    "build": "browserify lib/rxjs-web-midi.js -t babelify -o dist/rxjs-web-midi.js",
+    "test": "mocha --compilers js:babel/register"
   },
   "author": "Arto Chydenius",
   "license": "MIT",
   "devDependencies": {
+    "babel": "^5.8.23",
     "babelify": "^6.3.0",
     "browserify": "^11.2.0",
-    "uglifyjs": "^2.4.10",
+    "mocha": "^2.3.3",
     "watchify": "^3.4.0"
   },
   "dependencies": {
