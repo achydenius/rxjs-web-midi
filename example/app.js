@@ -5,24 +5,16 @@ import { midimessageAsObservable, statechangeAsObservable } from '../lib/rxjs-we
 const midi = Rx.Observable.fromPromise(navigator.requestMIDIAccess());
 
 // Sream of state change events
-const state = midi.flatMap((midi) => {
-    return statechangeAsObservable(midi);
-});
+const state = midi.flatMap(midi => statechangeAsObservable(midi));
 
 // First available MIDI input
-const input = midi.map((midi) => {
-    return midi.inputs.values().next().value;
-});
+const input = midi.map(midi => midi.inputs.values().next().value);
 
 // Stream of messages from the input
 const messages = input
-    .filter((input) => {
-        return input !== undefined;
-    })
-    .flatMap((input) => {
-        return midimessageAsObservable(input);
-    })
-    .map((x) => {
+    .filter(input => input !== undefined)
+    .flatMap(input => midimessageAsObservable(input))
+    .map(x => {
         // Collect relevant data from the message
         // See for example http://www.midi.org/techspecs/midimessages.php
         return {
@@ -35,20 +27,16 @@ const messages = input
     });
 
 // Stream of note on messages
-const notes = messages.filter((x) => {
-    return x.status === 144;
-});
+const notes = messages.filter(x => x.status === 144);
 
 // Stream of control change messages
-const controls = messages.filter((x) => {
-    return x.status === 176;
-});
+const controls = messages.filter(x => x.status === 176);
 
-state.subscribe((state) => {
+state.subscribe(state => {
     console.log(state);
 });
 
-input.subscribe((input) => {
+input.subscribe(input => {
     if (input !== undefined) {
         console.log('id: ' + input.id);
         console.log('name: ' + input.name);
@@ -58,13 +46,13 @@ input.subscribe((input) => {
     }
 });
 
-notes.subscribe((x) => {
+notes.subscribe(x => {
     const note = x.data[0];
     const velocity = x.data[1];
     console.log(`Note ${note} triggered with velocity ${velocity}`);
 });
 
-controls.subscribe((x) => {
+controls.subscribe(x => {
     const index = x.data[0];
     const value = x.data[1];
     console.log(`Control ${index} changed with value ${value}`);

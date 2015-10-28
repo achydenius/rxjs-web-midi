@@ -21,15 +21,15 @@ import Rx from 'rx';
 import { midimessageAsObservable } from 'rxjs-web-midi';
 
 Rx.Observable.fromPromise(navigator.requestMIDIAccess())
-    .map((midi) => {
+    .map(midi => {
         // Select first available input
         return midi.inputs.values().next().value;
     })
-    .flatMap((input) => {
+    .flatMap(input => {
         // Get stream of messages
         return midimessageAsObservable(input);
     })
-    .subscribe((message) => {
+    .subscribe(message => {
         // Output the message
         console.log(message);
     });
