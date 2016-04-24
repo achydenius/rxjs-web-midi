@@ -1,8 +1,10 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/* eslint no-param-reassign: ["error", { "props": false }] */
+
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
-    value: true
+  value: true
 });
 exports.midimessageAsObservable = midimessageAsObservable;
 exports.statechangeAsObservable = statechangeAsObservable;
@@ -13,33 +15,33 @@ var _rx = require('rx');
 
 var _rx2 = _interopRequireDefault(_rx);
 
+var createObservable = function createObservable(object, handlerName) {
+  return _rx2['default'].Observable.create(function (observer) {
+    if (object.observers === undefined) {
+      object.observers = [];
+      object[handlerName] = function (event) {
+        object.observers.forEach(function (obs) {
+          obs.onNext(event);
+        });
+      };
+    }
+
+    object.observers.push(observer);
+
+    return _rx2['default'].Disposable.create(function () {
+      object.observers = object.observers.filter(function (x) {
+        return x !== observer;
+      });
+    });
+  });
+};
+
 function midimessageAsObservable(input) {
-    return createObservable(input, 'onmidimessage');
+  return createObservable(input, 'onmidimessage');
 }
 
 function statechangeAsObservable(midi) {
-    return createObservable(midi, 'onstatechange');
-}
-
-function createObservable(object, handlerName) {
-    return _rx2['default'].Observable.create(function (observer) {
-        if (object.observers === undefined) {
-            object.observers = [];
-            object[handlerName] = function (event) {
-                object.observers.forEach(function (observer) {
-                    observer.onNext(event);
-                });
-            };
-        }
-
-        object.observers.push(observer);
-
-        return _rx2['default'].Disposable.create(function () {
-            object.observers = object.observers.filter(function (x) {
-                return x !== observer;
-            });
-        });
-    });
+  return createObservable(midi, 'onstatechange');
 }
 
 },{"rx":3}],2:[function(require,module,exports){

@@ -7,7 +7,7 @@
     "watch:example": "watchify example/app.js -t babelify -o example/dist.js -v",
     "build:example": "browserify example/app.js -t babelify -o example/dist.js",
     "build": "browserify lib/rxjs-web-midi.js -t babelify -o dist/rxjs-web-midi.js",
-    "test": "eslint lib/*.js && mocha --compilers js:babel/register"
+    "test": "eslint lib/*.js test/*.js && mocha --compilers js:babel/register"
   },
   "author": "Arto Chydenius",
   "license": "MIT",
