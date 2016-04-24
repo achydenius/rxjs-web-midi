@@ -2,58 +2,52 @@ import Rx from 'rx';
 import { midimessageAsObservable, statechangeAsObservable } from '../lib/rxjs-web-midi';
 
 // MIDIAccess object
-const midi = Rx.Observable.fromPromise(navigator.requestMIDIAccess());
+const midiAccess = Rx.Observable.fromPromise(navigator.requestMIDIAccess());
 
-// Sream of state change events
-const state = midi.flatMap(midi => statechangeAsObservable(midi));
+// Stream of state change events
+const stateStream = midiAccess.flatMap(access => statechangeAsObservable(access));
 
 // First available MIDI input
-const input = midi.map(midi => midi.inputs.values().next().value);
+const inputStream = midiAccess.map(access => access.inputs.values().next().value);
 
 // Stream of messages from the input
-const messages = input
-    .filter(input => input !== undefined)
-    .flatMap(input => midimessageAsObservable(input))
-    .map(x => {
-        // Collect relevant data from the message
-        // See for example http://www.midi.org/techspecs/midimessages.php
-        return {
-            status: x.data[0] & 0xf0,
-            data: [
-                x.data[1],
-                x.data[2]
-            ]
-        };
-    });
+const messages = inputStream
+  .filter(input => input !== undefined)
+  .flatMap(input => midimessageAsObservable(input))
+  .map(message => ({
+    // Collect relevant data from the message
+    // See for example http://www.midi.org/techspecs/midimessages.php
+    status: message.data[0] & 0xf0,
+    data: [
+      message.data[1],
+      message.data[2],
+    ],
+  }));
 
 // Stream of note on messages
-const notes = messages.filter(x => x.status === 144);
+const notes = messages.filter(message => message.status === 144);
 
 // Stream of control change messages
-const controls = messages.filter(x => x.status === 176);
+const controls = messages.filter(message => message.status === 176);
 
-state.subscribe(state => {
-    console.log(state);
+stateStream.subscribe(state => {
+  console.log(state);
 });
 
-input.subscribe(input => {
-    if (input !== undefined) {
-        console.log('id: ' + input.id);
-        console.log('name: ' + input.name);
-        console.log('manufacturer: ' + input.manufacturer);
-    } else {
-        console.log('No inputs available');
-    }
+inputStream.subscribe(input => {
+  if (input !== undefined) {
+    console.log(`id: ${input.id}`);
+    console.log(`name: ${input.name}`);
+    console.log(`manufacturer: ${input.manufacturer}`);
+  } else {
+    console.log('No inputs available');
+  }
 });
 
-notes.subscribe(x => {
-    const note = x.data[0];
-    const velocity = x.data[1];
-    console.log(`Note ${note} triggered with velocity ${velocity}`);
+notes.subscribe(message => {
+  console.log(`Note ${message.data[0]} triggered with velocity ${message.data[1]}`);
 });
 
-controls.subscribe(x => {
-    const index = x.data[0];
-    const value = x.data[1];
-    console.log(`Control ${index} changed with value ${value}`);
+controls.subscribe(message => {
+  console.log(`Control ${message.data[0]} changed with value ${message.data[1]}`);
 });
